@@ -1,9 +1,9 @@
 // models/livreurModel.js
 const pool = require('../config/database');
 
-// Trouver tous les livreurs
 const findAll = async () => {
-  const [rows] = await pool.query('SELECT * FROM Livreur');
+  // Changez 'Livreur' en 'Livreurs' pour correspondre au nom de la table
+  const [rows] = await pool.query('SELECT * FROM Livreurs');
   return rows;
 };
 

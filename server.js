@@ -31,13 +31,13 @@ app.use((req, res, next) => {
 // Montage des routes - Utiliser un préfixe comme /api/v1 est une bonne pratique
 const apiPrefix = '/api/v1';
 app.use(`${apiPrefix}/administrateurs`, administrateurRoutes);
-app.use(`${apiPrefix}/categories`, categorieRoutes);     // Décommenter quand créées
-app.use(`${apiPrefix}/clients`, clientRoutes);         // Décommenter quand créées
-app.use(`${apiPrefix}/commandes`, commandeRoutes);       // Décommenter quand créées
-app.use(`${apiPrefix}/livraisons`, livraisonRoutes);     // Décommenter quand créées
-app.use(`${apiPrefix}/livreurs`, livreurRoutes);         // Décommenter quand créées
-app.use(`${apiPrefix}/plats`, platRoutes);             // Décommenter quand créées
-app.use(`${apiPrefix}/restaurants`, restaurantRoutes);   // Décommenter quand créées
+app.use(`${apiPrefix}/categories`, categorieRoutes);     
+app.use(`${apiPrefix}/clients`, clientRoutes);        
+app.use(`${apiPrefix}/commandes`, commandeRoutes);      
+app.use(`${apiPrefix}/livraisons`, livraisonRoutes);    
+app.use(`${apiPrefix}/livreurs`, livreurRoutes);        
+app.use(`${apiPrefix}/plats`, platRoutes);           
+app.use(`${apiPrefix}/restaurants`, restaurantRoutes);  
 
 
 // Middleware de gestion d'erreur "attrape-tout" (doit être défini APRES les routes)

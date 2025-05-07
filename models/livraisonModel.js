@@ -3,7 +3,7 @@ const pool = require('../config/database');
 
 // Trouver toutes les livraisons
 const findAll = async () => {
-  const [rows] = await pool.query('SELECT * FROM Livraison');
+  const [rows] = await pool.query('SELECT * FROM Livraisons');
   return rows;
 };
 
