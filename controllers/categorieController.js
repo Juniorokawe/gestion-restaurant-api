@@ -5,7 +5,7 @@ const CategorieModel = require('../models/categorieModel');
 const getAllCategories = async (req, res) => {
   try {
     const categories = await CategorieModel.findAll();
-    res.json(categories);
+    res.send(resultat);
   } catch (error) {
     console.error("Erreur getAllCategories:", error);
     res.status(500).json({ message: 'Erreur serveur lors de la récupération des catégories' });
