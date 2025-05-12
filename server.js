@@ -15,7 +15,7 @@ const platRoutes = require('./routes/platRoutes');
 const restaurantRoutes = require('./routes/restaurantRoutes');
 
 const app = express();
-const port = process.env.PORT || 3000; // Utilise le port du .env ou 3000 par defaut
+const port = 2400; // Utilise le port du .env ou 3000 par defaut
 
 // Middleware essentiel pour parser le JSON des requêtes
 app.use(express.json());
@@ -39,23 +39,8 @@ app.use(`${apiPrefix}/livreurs`, livreurRoutes);
 app.use(`${apiPrefix}/plats`, platRoutes);           
 app.use(`${apiPrefix}/restaurants`, restaurantRoutes);  
 
-
-// Middleware de gestion d'erreur "attrape-tout" (doit être défini APRES les routes)
-app.use((err, req, res, next) => {
-  console.error('Erreur non gérée:', err.stack);
-  res.status(500).json({ message: 'Une erreur interne est survenue' });
-});
-
 // Démarrer le serveur
 app.listen(port, () => {
   console.log(`Serveur démarré sur http://localhost:${port}`);
-  console.log(`Endpoints Admin : http://localhost:${port}${apiPrefix}/administrateurs`);
-  console.log(`Endpoints Admin : http://localhost:${port}${apiPrefix}/categories`);
-  console.log(`Endpoints Admin : http://localhost:${port}${apiPrefix}/clients`);
-  console.log(`Endpoints Admin : http://localhost:${port}${apiPrefix}/commandes`);
-  console.log(`Endpoints Admin : http://localhost:${port}${apiPrefix}/livraisons`);
-  console.log(`Endpoints Admin : http://localhost:${port}${apiPrefix}/livreurs`);
-  console.log(`Endpoints Admin : http://localhost:${port}${apiPrefix}/plats`);
-  console.log(`Endpoints Admin : http://localhost:${port}${apiPrefix}/restaurants`);
-  // Logguez les autres endpoints ici...
+
 });
