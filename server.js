@@ -1,6 +1,7 @@
 // server.js
 require('dotenv').config(); // Charger les variables d'environnement en premier
 const express = require('express');
+const cors = require('cors'); // Ajoutez cette ligne
 // On importe le pool ici juste pour le log initial, mais il n'est pas utilisé directement
 const pool = require('./config/database');
 
@@ -16,6 +17,9 @@ const restaurantRoutes = require('./routes/restaurantRoutes');
 
 const app = express();
 const port = 2400; // Utilise le port du .env ou 3000 par defaut
+
+// Activer CORS pour toutes les routes
+app.use(cors());
 
 // Middleware essentiel pour parser le JSON des requêtes
 app.use(express.json());

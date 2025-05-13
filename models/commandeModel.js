@@ -3,7 +3,7 @@ const pool = require('../config/database');
 
 // Trouver toutes les commandes
 const findAll = async () => {
-  const [rows] = await pool.query('SELECT * FROM Commande');
+  const [rows] = await pool.query('SELECT * FROM Commandes');
   return rows;
 };
 

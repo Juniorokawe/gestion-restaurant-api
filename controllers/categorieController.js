@@ -16,7 +16,7 @@ const getAllCategories = async (req, res) => {
 const getCategorieById = async (req, res) => {
   try {
     const { id } = req.params;
-    const categorie = await CategorieModel.findById(id);
+    const categorie = await CategorieModel.findById(id); 
     if (!categorie) {
       return res.status(404).json({ message: 'Catégorie non trouvée' });
     }
