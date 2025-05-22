@@ -20,8 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Base de données : `gestion_restaurant`
 --
-CREATE DATABASE IF NOT EXISTS `gestion_restaurant` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE `gestion_restaurant`;
+CREATE DATABASE IF NOT EXISTS `TchopShap-api-rust` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `TchopShap-api-rust`;
 
 -- --------------------------------------------------------
 
@@ -63,6 +63,8 @@ INSERT INTO `Administrateur` (`id_administrateur`, `nom`, `prenom`, `email`) VAL
 CREATE TABLE `Categorie` (
   `id_categorie` int(11) NOT NULL,
   `categorie` varchar(100) DEFAULT NULL
+  `image` VARCHAR(255),          -- URL Cloudinary
+  `cloudinary_id` VARCHAR(255)   -- Public ID de Cloudinary
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -91,6 +93,8 @@ CREATE TABLE `Client` (
   `nom` varchar(100) NOT NULL,
   `prenom` varchar(100) NOT NULL,
   `telephone` varchar(20) DEFAULT NULL
+  `image` VARCHAR(255),          -- URL Cloudinary
+  `cloudinary_id` VARCHAR(255)   -- Public ID de Cloudinary
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -216,6 +220,8 @@ CREATE TABLE `Plat` (
   `nom` varchar(100) NOT NULL,
   `description` text DEFAULT NULL,
   `prix` decimal(8,2) NOT NULL,
+  `image` VARCHAR(255),          -- URL Cloudinary
+  `cloudinary_id` VARCHAR(255)   -- Public ID de Cloudinary
   `id_restaurant` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -247,6 +253,8 @@ CREATE TABLE `Restaurant` (
   `nom` varchar(100) NOT NULL,
   `adresse` varchar(255) NOT NULL,
   `telephone` varchar(20) DEFAULT NULL
+  `image` VARCHAR(255),          -- URL Cloudinary
+  `cloudinary_id` VARCHAR(255)   -- Public ID de Cloudinary
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --

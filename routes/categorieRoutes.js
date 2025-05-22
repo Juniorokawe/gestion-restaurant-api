@@ -8,7 +8,7 @@ router.route('/')
   .get(categorieController.getAllCategories)
   .post(categorieController.createCategorie);
 
-// Route pour récupérer, mettre à jour ou supprimer une catégorie spécifique
+// Route pour gérer une catégorie spécifique
 router.route('/:id')
   .get(categorieController.getCategorieById)
   .put(categorieController.updateCategorie)

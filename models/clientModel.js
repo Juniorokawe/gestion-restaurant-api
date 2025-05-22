@@ -14,16 +14,16 @@ const findById = async (id) => {
 };
 
 // Créer un nouveau client
-const create = async ({ nom, prenom, email }) => {
-  const sql = 'INSERT INTO Client (nom, prenom, email) VALUES (?, ?, ?)';
-  const [result] = await pool.query(sql, [nom, prenom, email]);
-  return { id: result.insertId, nom, prenom, email }; // Retourne l'objet créé avec son ID
-};
+const create = async ({ nom, prenom, phone, email, password }) => {
+  const sql = 'INSERT INTO Client (nom, prenom, phone, email, password) VALUES (?, ?, ?, ?, ?)';
+  const [result] = await pool.query(sql, [nom, prenom, phone, email, password, image]);
+  return { id: result.insertId, nom, prenom, phone, email, password, image}}; // Retourne l'objet créé avec son ID
+
 
 // Mettre à jour un client
-const update = async (id, { nom, prenom, email }) => {
-  const sql = 'UPDATE Client SET nom = ?, prenom = ?, email = ? WHERE id_client = ?';
-  const [result] = await pool.query(sql, [nom, prenom, email, id]);
+const update = async (id, { nom, prenom, phone, email, password }) => {
+  const sql = 'UPDATE Client SET nom = ?, prenom = ?, phone = ?, email = ?, password = ? WHERE id_client = ?';
+  const [result] = await pool.query(sql, [nom, prenom, phone, email, password, id]);
   return result.affectedRows; // Retourne le nombre de lignes affectées
 };
 

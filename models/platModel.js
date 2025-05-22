@@ -14,23 +14,27 @@ const findById = async (id) => {
 };
 
 // Créer un nouveau plat
-const create = async ({ nom, description, prix }) => {
-  const sql = 'INSERT INTO Plat (nom, description, prix) VALUES (?, ?, ?)';
-  const [result] = await pool.query(sql, [nom, description, prix]);
-  return { id: result.insertId, nom, description, prix };
+const create = async ({ nom, description, prix, id_restaurant }) => {
+  const [result] = await pool.query(
+    'INSERT INTO Plat (nom, description, prix, id_restaurant) VALUES (?, ?, ?, ?)',
+    [nom, description, prix, id_restaurant]
+  );
+  return { id: result.insertId, nom, description, prix, id_restaurant };
 };
 
 // Mettre à jour un plat
-const update = async (id, { nom, description, prix }) => {
-  const sql = 'UPDATE Plat SET nom = ?, description = ?, prix = ? WHERE id_plat = ?';
-  const [result] = await pool.query(sql, [nom, description, prix, id]);
-  return result.affectedRows;
+const update = async (id, { nom, description, prix, id_restaurant }) => {
+  const [result] = await pool.query(
+    'UPDATE Plat SET nom = ?, description = ?, prix = ?, id_restaurant = ? WHERE id_plat = ?',
+    [nom, description, prix, id_restaurant, id]
+  );
+  return result.affectedRows > 0;
 };
 
 // Supprimer un plat
 const remove = async (id) => {
   const [result] = await pool.query('DELETE FROM Plat WHERE id_plat = ?', [id]);
-  return result.affectedRows;
+  return result.affectedRows > 0;
 };
 
 module.exports = {

@@ -30,12 +30,13 @@ const getClientById = async (req, res) => {
 // POST /clients
 const createClient = async (req, res) => {
   try {
-    const { nom, prenom, email } = req.body;
-    if (!nom || !prenom || !email) {
-        return res.status(400).json({ message: 'Les champs nom, prenom et email sont requis.' });
+    const { nom, prenom, phone, email, password } = req.body;
+    const{image} = req.body; // Assurez-vous que l'image est envoyée dans le corps de la requête
+    if (!nom || !prenom || !phone || !email || !password) {
+        return res.status(400).json({ message: 'Veillez remplir tout les champs: nom, prenom, numéro de téléphone etc...' });
     }
 
-    const nouveauClient = await ClientModel.create({ nom, prenom, email });
+    const nouveauClient = await ClientModel.create({ nom, prenom, phone, email, password, image });
     res.status(201).json({ message: 'Client ajouté', client: nouveauClient });
   } catch (error) {
     console.error("Erreur createClient:", error);
@@ -50,12 +51,9 @@ const createClient = async (req, res) => {
 const updateClient = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nom, prenom, email } = req.body;
-     if (!nom || !prenom || !email) {
-        return res.status(400).json({ message: 'Les champs nom, prenom et email sont requis pour la mise à jour.' });
-    }
+    const { nom, prenom, email, image } = req.body;
 
-    const affectedRows = await ClientModel.update(id, { nom, prenom, email });
+    const affectedRows = await ClientModel.update(id, { nom, prenom, email, image });
     if (affectedRows === 0) {
       return res.status(404).json({ message: 'Client non trouvé pour la mise à jour' });
     }

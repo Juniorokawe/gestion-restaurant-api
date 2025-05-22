@@ -30,19 +30,27 @@ const getPlatById = async (req, res) => {
 // POST /plats
 const createPlat = async (req, res) => {
   try {
-    const { nom, prenom, email } = req.body;
-    if (!nom || !prenom || !email) {
-        return res.status(400).json({ message: 'Les champs nom, prenom et email sont requis.' });
+    const { nom, description, prix, id_restaurant } = req.body;
+    const { image_url } = req.body; // Assurez-vous que l'image est envoyée dans le corps de la requête
+    if (!nom || !description || !prix || !id_restaurant || !image_url) {
+      return res.status(400).json({ message: 'Tous les champs sont requis' });
     }
 
-    const nouveauPlat = await PlatModel.create({ nom, prenom, email });
-    res.status(201).json({ message: 'Plat ajouté', plat: nouveauPlat });
+    const nouveauPlat = await PlatModel.create({ 
+      nom, 
+      description, 
+      prix, 
+      id_restaurant,
+      image_url
+    });
+    
+    res.status(201).json({
+      message: 'Plat créé avec succès',
+      plat: nouveauPlat
+    });
   } catch (error) {
-    console.error("Erreur createPlat:", error);
-    if (error.code === 'ER_DUP_ENTRY') {
-         return res.status(409).json({ message: 'Cet email est déjà utilisé.' });
-    }
-    res.status(500).json({ message: 'Erreur serveur lors de la création du plat' });
+    console.error('Erreur création plat:', error);
+    res.status(500).json({ message: 'Erreur serveur' });
   }
 };
 
@@ -50,22 +58,27 @@ const createPlat = async (req, res) => {
 const updatePlat = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nom, prenom, email } = req.body;
-     if (!nom || !prenom || !email) {
-        return res.status(400).json({ message: 'Les champs nom, prenom et email sont requis pour la mise à jour.' });
+    const { nom, description, prix, id_restaurant } = req.body;
+    
+    if (!nom || !description || !prix || !id_restaurant) {
+      return res.status(400).json({ message: 'Tous les champs sont requis' });
     }
 
-    const affectedRows = await PlatModel.update(id, { nom, prenom, email });
-    if (affectedRows === 0) {
-      return res.status(404).json({ message: 'Plat non trouvé pour la mise à jour' });
+    const platMisAJour = await PlatModel.update(id, { 
+      nom, 
+      description, 
+      prix, 
+      id_restaurant 
+    });
+    
+    if (!platMisAJour) {
+      return res.status(404).json({ message: 'Plat non trouvé' });
     }
-    res.json({ message: 'Plat mis à jour' });
+    
+    res.json({ message: 'Plat mis à jour avec succès' });
   } catch (error) {
-    console.error("Erreur updatePlat:", error);
-     if (error.code === 'ER_DUP_ENTRY') {
-         return res.status(409).json({ message: 'Cet email est déjà utilisé par un autre plat.' });
-    }
-    res.status(500).json({ message: 'Erreur serveur lors de la mise à jour du plat' });
+    console.error('Erreur mise à jour plat:', error);
+    res.status(500).json({ message: 'Erreur serveur' });
   }
 };
 
@@ -73,17 +86,16 @@ const updatePlat = async (req, res) => {
 const deletePlat = async (req, res) => {
   try {
     const { id } = req.params;
-    const affectedRows = await PlatModel.remove(id);
-    if (affectedRows === 0) {
-      return res.status(404).json({ message: 'Plat non trouvé pour la suppression' });
+    const resultat = await PlatModel.remove(id);
+    
+    if (!resultat) {
+      return res.status(404).json({ message: 'Plat non trouvé' });
     }
-    res.status(200).json({ message: 'Plat supprimé' });
+    
+    res.json({ message: 'Plat supprimé avec succès' });
   } catch (error) {
-    console.error("Erreur deletePlat:", error);
-    if (error.code === 'ER_ROW_IS_REFERENCED_2') {
-        return res.status(400).json({ message: 'Impossible de supprimer ce plat car il est référencé ailleurs.' });
-    }
-    res.status(500).json({ message: 'Erreur serveur lors de la suppression du plat' });
+    console.error('Erreur suppression plat:', error);
+    res.status(500).json({ message: 'Erreur serveur' });
   }
 };
 

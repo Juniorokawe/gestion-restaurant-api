@@ -1,50 +1,85 @@
-// server.js
-require('dotenv').config(); // Charger les variables d'environnement en premier
+require('dotenv').config();
 const express = require('express');
-const cors = require('cors'); // Ajoutez cette ligne
-// On importe le pool ici juste pour le log initial, mais il n'est pas utilisé directement
+const cors = require('cors');
 const pool = require('./config/database');
-
-// Importe les routeurs
-const administrateurRoutes = require('./routes/administrateurRoutes');
-const categorieRoutes = require('./routes/categorieRoutes'); 
-const clientRoutes = require('./routes/clientRoutes');       
-const commandeRoutes = require('./routes/commandeRoutes');    
-const livraisonRoutes = require('./routes/livraisonRoutes');  
-const livreurRoutes = require('./routes/livreurRoutes');      
-const platRoutes = require('./routes/platRoutes');          
-const restaurantRoutes = require('./routes/restaurantRoutes');
+const middleware = require('./middleware/auth');
 
 const app = express();
-const port = 2400; // Utilise le port du .env ou 3000 par defaut
+const port = process.env.PORT || 2400;
 
-// Activer CORS pour toutes les routes
+// Test de connexion à la base de données
+async function testConnection() {
+  try {
+    const connection = await pool.getConnection();
+    console.log('✅ Connexion à la base de données réussie');
+    connection.release();
+  } catch (error) {
+    console.error('❌ Erreur de connexion:', error);
+  }
+}
+
+testConnection();
+
+// Middlewares
 app.use(cors());
-
-// Middleware essentiel pour parser le JSON des requêtes
 app.use(express.json());
-// Middleware pour parser les données de formulaire URL-encoded (optionnel mais utile)
 app.use(express.urlencoded({ extended: true }));
 
-// Middleware simple pour logger les requêtes (optionnel)
-app.use((req, res, next) => {
-    console.log(`${req.method} ${req.path}`);
-    next();
+// Import des routes
+const utilisateurRoutes = require('./routes/utilisateurRoutes');
+const categorieRoutes = require('./routes/categorieRoutes');
+const commandeRoutes = require('./routes/commandeRoutes');
+const livraisonRoutes = require('./routes/livraisonRoutes');
+const livreurRoutes = require('./routes/livreurRoutes');
+const platRoutes = require('./routes/platRoutes');
+const restaurantRoutes = require('./routes/restaurantRoutes');
+
+// Configuration des routes
+app.use('/api/v1/utilisateurs', utilisateurRoutes);
+app.use('/api/v1/categories', categorieRoutes);
+app.use('/api/v1/commandes', commandeRoutes);
+app.use('/api/v1/livraisons', livraisonRoutes);
+app.use('/api/v1/livreurs', livreurRoutes);
+app.use('/api/v1/plats', platRoutes);
+app.use('/api/v1/restaurants', restaurantRoutes);
+
+// Route de test API
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'API opérationnelle ✅' });
 });
 
-// Montage des routes - Utiliser un préfixe comme /api/v1 est une bonne pratique
-const apiPrefix = '/api/v1';
-app.use(`${apiPrefix}/administrateurs`, administrateurRoutes);
-app.use(`${apiPrefix}/categories`, categorieRoutes);     
-app.use(`${apiPrefix}/clients`, clientRoutes);        
-app.use(`${apiPrefix}/commandes`, commandeRoutes);      
-app.use(`${apiPrefix}/livraisons`, livraisonRoutes);    
-app.use(`${apiPrefix}/livreurs`, livreurRoutes);        
-app.use(`${apiPrefix}/plats`, platRoutes);           
-app.use(`${apiPrefix}/restaurants`, restaurantRoutes);  
+// Gestion globale des erreurs
+app.use((err, req, res, next) => {
+  console.error('Erreur:', err.stack);
+  res.status(500).json({
+    success: false,
+    message: 'Erreur interne du serveur',
+    error: process.env.NODE_ENV === 'development' ? err.message : {}
+  });
+});
 
-// Démarrer le serveur
+// Gestion des routes non trouvées
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: 'Route non trouvée'
+  });
+});
+
+// Démarrage du serveur
 app.listen(port, () => {
-  console.log(`Serveur démarré sur http://localhost:${port}`);
+  console.log(`✅ Serveur démarré sur http://localhost:${port}`);
+}).on('error', (err) => {
+  console.error('❌ Erreur de démarrage du serveur:', err);
+});
 
+// Gestion des signaux d'arrêt
+process.on('SIGTERM', () => {
+  console.log('Signal SIGTERM reçu. Arrêt gracieux du serveur...');
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  console.log('Signal SIGINT reçu. Arrêt gracieux du serveur...');
+  process.exit(0);
 });
