@@ -30,12 +30,9 @@ const getLivreurById = async (req, res) => {
 // POST /livreurs
 const createLivreur = async (req, res) => {
   try {
-    const { nom, prenom, email } = req.body;
-    if (!nom || !prenom || !email) {
-        return res.status(400).json({ message: 'Les champs nom, prenom et email sont requis.' });
-    }
+    const { nom, prenom, phone, type_de_vehicule, statut } = req.body;
 
-    const nouveauLivreur = await LivreurModel.create({ nom, prenom, email });
+    const nouveauLivreur = await LivreurModel.create({ nom, prenom, phone, type_de_vehicule, statut });
     res.status(201).json({ message: 'Livreur ajouté', livreur: nouveauLivreur });
   } catch (error) {
     console.error("Erreur createLivreur:", error);
@@ -50,12 +47,8 @@ const createLivreur = async (req, res) => {
 const updateLivreur = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nom, prenom, email } = req.body;
-     if (!nom || !prenom || !email) {
-        return res.status(400).json({ message: 'Les champs nom, prenom et email sont requis pour la mise à jour.' });
-    }
-
-    const affectedRows = await LivreurModel.update(id, { nom, prenom, email });
+    const { nom, prenom, phone, type_de_vehicule, statut } = req.body;
+    const affectedRows = await LivreurModel.update(id, { nom, prenom, phone, type_de_vehicule, statut });
     if (affectedRows === 0) {
       return res.status(404).json({ message: 'Livreur non trouvé pour la mise à jour' });
     }

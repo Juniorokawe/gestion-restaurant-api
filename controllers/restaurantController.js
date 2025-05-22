@@ -30,12 +30,9 @@ const getRestaurantById = async (req, res) => {
 // POST /restaurants
 const createRestaurant = async (req, res) => {
   try {
-    const { nom, prenom, email } = req.body;
-    if (!nom || !prenom || !email) {
-        return res.status(400).json({ message: 'Les champs nom, prenom et email sont requis.' });
-    }
+    const { nom, phone, image, categorie, adresse } = req.body;
 
-    const nouveauRestaurant = await RestaurantModel.create({ nom, prenom, email });
+    const nouveauRestaurant = await RestaurantModel.create({ nom, phone, categorie, image, adresse });
     res.status(201).json({ message: 'Restaurant ajouté', restaurant: nouveauRestaurant });
   } catch (error) {
     console.error("Erreur createRestaurant:", error);
@@ -50,12 +47,10 @@ const createRestaurant = async (req, res) => {
 const updateRestaurant = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nom, prenom, email } = req.body;
-     if (!nom || !prenom || !email) {
-        return res.status(400).json({ message: 'Les champs nom, prenom et email sont requis pour la mise à jour.' });
-    }
+    const { nom, phone, image, categorie } = req.body;
+     
 
-    const affectedRows = await RestaurantModel.update(id, { nom, prenom, email });
+    const affectedRows = await RestaurantModel.update(id, { nom, phone, categorie, image });
     if (affectedRows === 0) {
       return res.status(404).json({ message: 'Restaurant non trouvé pour la mise à jour' });
     }

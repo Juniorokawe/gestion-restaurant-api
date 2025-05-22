@@ -15,15 +15,16 @@ const findById = async (id) => {
 
 // Créer un nouveau livreur
 const create = async ({ nom, prenom, email }) => {
-  const sql = 'INSERT INTO Livreur (nom, prenom, email) VALUES (?, ?, ?)';
-  const [result] = await pool.query(sql, [nom, prenom, email]);
-  return { id: result.insertId, nom, prenom, email };
+  const sql = 'INSERT INTO Livreur (nom, prenom, statut, type_de_vehicule, phone) VALUES (?, ?, ?, ?, ?)';
+  
+  const [result] = await pool.query(sql, [nom, prenom, statut, type_de_vehicule, phone]);
+  return { id: result.insertId, nom, prenom, statut, type_de_vehicule, phone };
 };
 
 // Mettre à jour un livreur
-const update = async (id, { nom, prenom, email }) => {
-  const sql = 'UPDATE Livreur SET nom = ?, prenom = ?, email = ? WHERE id_livreur = ?';
-  const [result] = await pool.query(sql, [nom, prenom, email, id]);
+const update = async (id, { nom, prenom, statut, type_de_vehicule, phone }) => {
+  const sql = 'UPDATE Livreur SET nom = ?, prenom = ?, statut = ? type_de_vehicule= ? phone = ? WHERE id_livreur = ?';
+  const [result] = await pool.query(sql, [nom, prenom, statut, type_de_vehicule, phone, id]);
   return result.affectedRows;
 };
 

@@ -30,12 +30,9 @@ const getLivraisonById = async (req, res) => {
 // POST /livraisons
 const createLivraison = async (req, res) => {
   try {
-    const { nom, prenom, email } = req.body;
-    if (!nom || !prenom || !email) {
-        return res.status(400).json({ message: 'Les champs nom, prenom et email sont requis.' });
-    }
+    const { id_commande, id_livreur, adresse_livraison, statut, date_livraison } = req.body;
 
-    const nouvelleLivraison = await LivraisonModel.create({ nom, prenom, email });
+    const nouvelleLivraison = await LivraisonModel.create({ id_commande, id_livreur, adresse_livraison, statut, date_livraison });
     res.status(201).json({ message: 'Livraison créée', livraison: nouvelleLivraison });
   } catch (error) {
     console.error("Erreur createLivraison:", error);
@@ -50,12 +47,9 @@ const createLivraison = async (req, res) => {
 const updateLivraison = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nom, prenom, email } = req.body;
-     if (!nom || !prenom || !email) {
-        return res.status(400).json({ message: 'Les champs nom, prenom et email sont requis pour la mise à jour.' });
-    }
+    const { id_commande, id_livreur, adresse_livraison, statut, date_livraison } = req.body;
 
-    const affectedRows = await LivraisonModel.update(id, { nom, prenom, email });
+    const affectedRows = await LivraisonModel.update(id, { id_commande, id_livreur, adresse_livraison, statut, date_livraison });
     if (affectedRows === 0) {
       return res.status(404).json({ message: 'Livraison non trouvée pour la mise à jour' });
     }

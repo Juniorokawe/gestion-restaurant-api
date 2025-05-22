@@ -15,15 +15,15 @@ const findById = async (id) => {
 
 // Créer un nouveau restaurant
 const create = async ({ nom, adresse, telephone, email, horaires }) => {
-  const sql = 'INSERT INTO Restaurant (nom, adresse, telephone, email, horaires) VALUES (?, ?, ?, ?, ?)';
-  const [result] = await pool.query(sql, [nom, adresse, telephone, email, horaires]);
-  return { id: result.insertId, nom, adresse, telephone, email, horaires };
+  const sql = 'INSERT INTO Restaurant (nom, adresse, phone, image, horaires) VALUES (?, ?, ?, ?, ?)';
+  const [result] = await pool.query(sql, [nom, adresse, phone, image, horaires]);
+  return { id: result.insertId, nom, adresse, phone, image, horaires };
 };
 
 // Mettre à jour un restaurant
-const update = async (id, { nom, adresse, telephone, email, horaires }) => {
-  const sql = 'UPDATE Restaurant SET nom = ?, adresse = ?, telephone = ?, email = ?, horaires = ? WHERE id_restaurant = ?';
-  const [result] = await pool.query(sql, [nom, adresse, telephone, email, horaires, id]);
+const update = async (id, { nom, adresse, phone, image, horaires }) => {
+  const sql = 'UPDATE Restaurant SET nom = ?, adresse = ?, phone = ?, image = ?, horaires = ? WHERE id_restaurant = ?';
+  const [result] = await pool.query(sql, [nom, adresse, phone, image, horaires, id]);
   return result.affectedRows;
 };
 

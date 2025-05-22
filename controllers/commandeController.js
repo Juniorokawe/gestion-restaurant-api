@@ -30,12 +30,9 @@ const getCommandeById = async (req, res) => {
 // POST /commandes
 const createCommande = async (req, res) => {
   try {
-    const { statut, mode_de_paiement, date } = req.body;
-    if (!statut || !mode_de_paiement || !date) {
-        return res.status(400).json({ message: 'Les champs statut, mode_de_paiement et date sont requis.' });
-    }
+    const { statut, mode_de_paiement, date, id_utilisateur, id_plat } = req.body;
 
-    const nouvelleCommande = await CommandeModel.create({ statut, mode_de_paiement, date });
+    const nouvelleCommande = await CommandeModel.create({ statut, mode_de_paiement, date, id_utilisateur, id_plat });
     res.status(201).json({ message: 'Commande créée', commande: nouvelleCommande });
   } catch (error) {
     console.error("Erreur createCommande:", error);
@@ -48,9 +45,6 @@ const updateCommande = async (req, res) => {
   try {
     const { id } = req.params;
     const { statut, mode_de_paiement, date } = req.body;
-    if (!statut || !mode_de_paiement || !date) {
-        return res.status(400).json({ message: 'Les champs statut, mode_de_paiement et date sont requis pour la mise à jour.' });
-    }
 
     const affectedRows = await CommandeModel.update(id, { statut, mode_de_paiement, date });
     if (affectedRows === 0) {

@@ -40,7 +40,8 @@ const createUtilisateur = async (req, res) => {
       telephone,
       email,
       password: hashedPassword,
-      role
+      role,
+      image
     });
 
     res.status(201).json({

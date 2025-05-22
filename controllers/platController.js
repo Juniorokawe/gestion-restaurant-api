@@ -30,18 +30,14 @@ const getPlatById = async (req, res) => {
 // POST /plats
 const createPlat = async (req, res) => {
   try {
-    const { nom, description, prix, id_restaurant } = req.body;
-    const { image_url } = req.body; // Assurez-vous que l'image est envoyée dans le corps de la requête
-    if (!nom || !description || !prix || !id_restaurant || !image_url) {
-      return res.status(400).json({ message: 'Tous les champs sont requis' });
-    }
+    const { nom, description, prix, id_restaurant, image } = req.body;
 
     const nouveauPlat = await PlatModel.create({ 
       nom, 
       description, 
       prix, 
       id_restaurant,
-      image_url
+      image
     });
     
     res.status(201).json({
@@ -58,17 +54,14 @@ const createPlat = async (req, res) => {
 const updatePlat = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nom, description, prix, id_restaurant } = req.body;
-    
-    if (!nom || !description || !prix || !id_restaurant) {
-      return res.status(400).json({ message: 'Tous les champs sont requis' });
-    }
+    const { nom, description, prix, id_restaurant, image } = req.body;
 
     const platMisAJour = await PlatModel.update(id, { 
       nom, 
       description, 
       prix, 
-      id_restaurant 
+      id_restaurant,
+      image 
     });
     
     if (!platMisAJour) {

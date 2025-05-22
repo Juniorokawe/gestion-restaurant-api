@@ -14,16 +14,16 @@ const findById = async (id) => {
 };
 
 // Créer une nouvelle livraison
-const create = async ({ nom, prenom, email }) => {
-  const sql = 'INSERT INTO Livraison (nom, prenom, email) VALUES (?, ?, ?)';
-  const [result] = await pool.query(sql, [nom, prenom, email]);
+const create = async ({ nom, id_commande, id_livreur, adresse_livraison, statut, date_livraison }) => {
+  const sql = 'INSERT INTO Livraison (nom, id_commande, id_livreur, adresse_livraison, statut, date_livraison ) VALUES (?, ?, ?, ?, ?, ?)';
+  const [result] = await pool.query(sql, [nom, id_commande, id_livreur, adresse_livraison, statut, date_livraison]);
   return { id: result.insertId, nom, prenom, email };
 };
 
 // Mettre à jour une livraison
 const update = async (id, { nom, prenom, email }) => {
-  const sql = 'UPDATE Livraison SET nom = ?, prenom = ?, email = ? WHERE id_livraison = ?';
-  const [result] = await pool.query(sql, [nom, prenom, email, id]);
+  const sql = 'UPDATE Livraison SET nom = ?, id_commande = ?, id_livreur = ? adresse_livraison = ? statut = ? date_livraison = ? WHERE id_livraison = ?';
+  const [result] = await pool.query(sql, [nom, id_commande, id_livreur, adresse_livraison, statut, date_livraison , id]);
   return result.affectedRows;
 };
 
