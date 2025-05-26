@@ -21,7 +21,9 @@ async function testConnection() {
 testConnection();
 
 // Middlewares
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000' // ou http://localhost:5173 pour Vite
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
