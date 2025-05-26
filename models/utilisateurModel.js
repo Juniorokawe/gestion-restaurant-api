@@ -25,11 +25,11 @@ const findByEmail = async (email) => {
 };
 
 // Créer un nouvel utilisateur
-const create = async ({ nom, prenom, telephone, email, password, role }) => {
+const create = async ({ nom, email, password, role }) => {
     try {
         const [result] = await pool.query(
-            'INSERT INTO Utilisateurs (nom, prenom, telephone, email, password, role) VALUES (?, ?, ?, ?, ?, ?)',
-            [nom, prenom, telephone, email, password, role]
+            'INSERT INTO Utilisateurs (nom, email, password, role) VALUES (?, ?, ?, ?)',
+            [nom, email, password, role]
         );
 
         console.log('Résultat création utilisateur:', result);
@@ -52,10 +52,10 @@ const create = async ({ nom, prenom, telephone, email, password, role }) => {
 };
 
 // Mettre à jour un utilisateur
-const update = async (id, { nom, prenom, telephone, email, role }) => {
+const update = async (id, { nom, email, role }) => {
   const [result] = await pool.query(
-    'UPDATE Utilisateurs SET nom = ?, prenom = ?, telephone = ?, email = ?, role = ? WHERE id_utilisateur = ?',
-    [nom, prenom, telephone, email, role, id]
+    'UPDATE Utilisateurs SET nom = ?, email = ?, role = ? WHERE id_utilisateur = ?',
+    [nom, email, role, id]
   );
   return result.affectedRows > 0; // Retourne true si une ligne a été modifiée
 };

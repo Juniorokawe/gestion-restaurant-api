@@ -185,12 +185,12 @@ const deleteUtilisateur = async (req, res) => {
 
 const register = async (req, res) => {
     try {
-        const { nom, prenom, telephone, email, password, role } = req.body;
+        const { nom, email, password, role } = req.body;
 
         // Validation
-        if (!email || !password || !role) {
+        if (!nom || !email || !password || !role) {
             return res.status(400).json({ 
-                message: 'Les champs email, mot de passe et rôle sont obligatoires' 
+                message: 'Les champs nom, email, password et rôle sont obligatoires' 
             });
         }
 
@@ -210,9 +210,7 @@ const register = async (req, res) => {
 
         // Création de l'utilisateur
         const nouvelUtilisateur = await UtilisateurModel.create({
-            nom, 
-            prenom, 
-            telephone, 
+            nom,  
             email, 
             password: hashedPassword, 
             role
@@ -338,7 +336,7 @@ module.exports = {
   getAllUtilisateurs,
   getUtilisateurById,
   createUtilisateur,
-  loginUtilisateur, // Changez 'login' en 'loginUtilisateur'
+  loginUtilisateur, 
   updateUtilisateur,
   deleteUtilisateur,
   register,
