@@ -210,15 +210,23 @@ const register = async (req, res) => {
 
         // Création de l'utilisateur
         const nouvelUtilisateur = await UtilisateurModel.create({
-            nom, prenom, telephone, email, password: hashedPassword, role
+            nom, 
+            prenom, 
+            telephone, 
+            email, 
+            password: hashedPassword, 
+            role
         });
+
+        console.log('Nouvel utilisateur créé:', nouvelUtilisateur);
 
         // Génération et stockage de l'OTP
         const otp = generateOTP();
-        const expiryTime = new Date(Date.now() + 5 * 60000); // 5 minutes
-        await UtilisateurModel.storeOTP(nouvelUtilisateur.id, otp, expiryTime);
+        const expiryTime = new Date(Date.now() + 5 * 60000);
 
-        // Envoi de l'email avec l'OTP
+        await UtilisateurModel.storeOTP(nouvelUtilisateur.id_utilisateur, otp, expiryTime);
+
+        // Envoi de l'email
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: email,
@@ -232,11 +240,14 @@ const register = async (req, res) => {
 
         res.status(201).json({
             message: 'Inscription réussie. Veuillez vérifier votre email',
-            userId: nouvelUtilisateur.id
+            userId: nouvelUtilisateur.id_utilisateur
         });
     } catch (error) {
         console.error("Erreur inscription:", error);
-        res.status(500).json({ message: 'Erreur lors de l\'inscription' });
+        res.status(500).json({ 
+            message: 'Erreur lors de l\'inscription',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
 };
 
@@ -244,19 +255,30 @@ const register = async (req, res) => {
 const verifyOTP = async (req, res) => {
     try {
         const { userId, otp } = req.body;
-
-        const verification = await UtilisateurModel.verifyOTP(userId, otp);
-        if (!verification) {
+        
+        // Validation des entrées
+        if (!userId || !otp) {
             return res.status(400).json({ 
-                message: 'Code OTP invalide ou expiré' 
+                message: 'UserId et OTP sont requis' 
             });
         }
 
+        console.log('Tentative de vérification OTP:', { userId, otp });
+
+        // Vérification de l'OTP
+        const verification = await UtilisateurModel.verifyOTP(userId, otp);
+        console.log('Résultat vérification:', verification);
+
+        
+        // Marquer comme vérifié
         await UtilisateurModel.markAsVerified(userId);
 
-        // Génération du token après vérification
+        // Génération du token
         const token = jwt.sign(
-            { userId, role: verification.role },
+            { 
+                userId: verification.id_utilisateur, 
+                role: verification.role 
+            },
             process.env.JWT_SECRET,
             { expiresIn: '24h' }
         );
@@ -273,7 +295,10 @@ const verifyOTP = async (req, res) => {
         });
     } catch (error) {
         console.error("Erreur vérification OTP:", error);
-        res.status(500).json({ message: 'Erreur lors de la vérification' });
+        res.status(500).json({ 
+            message: 'Erreur lors de la vérification',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
 };
 

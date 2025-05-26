@@ -26,11 +26,29 @@ const findByEmail = async (email) => {
 
 // Créer un nouvel utilisateur
 const create = async ({ nom, prenom, telephone, email, password, role }) => {
-  const [result] = await pool.query(
-    'INSERT INTO Utilisateurs (nom, prenom, telephone, email, password, role) VALUES (?, ?, ?, ?, ?, ?)',
-    [nom, prenom, telephone, email, password, role]
-  );
-  return { id: result.insertId, nom, prenom, telephone, email, role }; // Retourne l'objet créé avec son ID
+    try {
+        const [result] = await pool.query(
+            'INSERT INTO Utilisateurs (nom, prenom, telephone, email, password, role) VALUES (?, ?, ?, ?, ?, ?)',
+            [nom, prenom, telephone, email, password, role]
+        );
+
+        console.log('Résultat création utilisateur:', result);
+
+        if (!result.insertId) {
+            throw new Error('Échec de la création de l\'utilisateur');
+        }
+
+        // Récupérer l'utilisateur créé
+        const [rows] = await pool.query(
+            'SELECT * FROM Utilisateurs WHERE id_utilisateur = ?',
+            [result.insertId]
+        );
+
+        return rows[0];
+    } catch (error) {
+        console.error('Erreur dans create:', error);
+        throw error;
+    }
 };
 
 // Mettre à jour un utilisateur
@@ -49,27 +67,58 @@ const remove = async (id) => {
 };
 
 const storeOTP = async (userId, otp, expiryTime) => {
-    const [result] = await pool.query(
-        'UPDATE Utilisateurs SET otp = ?, otp_expiry = ?, is_verified = false WHERE id_utilisateur = ?',
-        [otp, expiryTime, userId]
-    );
-    return result.affectedRows > 0;
+    try {
+        console.log('Tentative de stockage OTP:', { userId, otp, expiryTime });
+        
+        const [result] = await pool.query(
+            'UPDATE Utilisateurs SET otp = ?, otp_expiry = ?, is_verified = ? WHERE id_utilisateur = ?',
+            [otp, expiryTime, false, userId]
+        );
+        
+        if (result.affectedRows === 0) {
+            throw new Error(`Aucun utilisateur trouvé avec l'ID: ${userId}`);
+        }
+        
+        console.log('OTP stocké avec succès');
+        return true;
+    } catch (error) {
+        console.error('Erreur dans storeOTP:', error);
+        throw error;
+    }
 };
 
 const verifyOTP = async (userId, otp) => {
-    const [rows] = await pool.query(
-        'SELECT * FROM Utilisateurs WHERE id_utilisateur = ? AND otp = ? AND otp_expiry > NOW() AND is_verified = false',
-        [userId, otp]
-    );
-    return rows[0];
+    try {
+        console.log('Vérification OTP:', { userId, otp });
+        
+        const [rows] = await pool.query(
+            `SELECT * FROM Utilisateurs 
+             WHERE id_utilisateur = ? 
+             AND otp = ? 
+             AND otp_expiry > NOW() 
+             AND is_verified = false`,
+            [userId, otp]
+        );
+        
+        console.log('Résultat requête verifyOTP:', rows[0]);
+        return rows[0];
+    } catch (error) {
+        console.error('Erreur dans verifyOTP:', error);
+        throw error;
+    }
 };
 
 const markAsVerified = async (userId) => {
+  try {
     const [result] = await pool.query(
-        'UPDATE Utilisateurs SET is_verified = true, otp = NULL, otp_expiry = NULL WHERE id_utilisateur = ?',
-        [userId]
+      'UPDATE Utilisateurs SET is_verified = true, otp = NULL, otp_expiry = NULL WHERE id_utilisateur = ?',
+      [userId]
     );
     return result.affectedRows > 0;
+  } catch (error) {
+    console.error('Erreur markAsVerified:', error);
+    throw error;
+  }
 };
 
 module.exports = {
