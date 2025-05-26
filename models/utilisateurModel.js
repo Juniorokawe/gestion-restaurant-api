@@ -48,11 +48,38 @@ const remove = async (id) => {
   return result.affectedRows > 0; // Retourne true si une ligne a été supprimée
 };
 
+const storeOTP = async (userId, otp, expiryTime) => {
+    const [result] = await pool.query(
+        'UPDATE Utilisateurs SET otp = ?, otp_expiry = ?, is_verified = false WHERE id_utilisateur = ?',
+        [otp, expiryTime, userId]
+    );
+    return result.affectedRows > 0;
+};
+
+const verifyOTP = async (userId, otp) => {
+    const [rows] = await pool.query(
+        'SELECT * FROM Utilisateurs WHERE id_utilisateur = ? AND otp = ? AND otp_expiry > NOW() AND is_verified = false',
+        [userId, otp]
+    );
+    return rows[0];
+};
+
+const markAsVerified = async (userId) => {
+    const [result] = await pool.query(
+        'UPDATE Utilisateurs SET is_verified = true, otp = NULL, otp_expiry = NULL WHERE id_utilisateur = ?',
+        [userId]
+    );
+    return result.affectedRows > 0;
+};
+
 module.exports = {
   findAll,
   findById,
   findByEmail,
   create,
   update,
-  remove
+  remove,
+  storeOTP,
+  verifyOTP,
+  markAsVerified
 };

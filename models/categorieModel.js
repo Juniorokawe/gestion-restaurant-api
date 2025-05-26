@@ -25,8 +25,8 @@ const create = async ({ categorie, image}) => {
 // Mettre à jour une catégorie
 const update = async (id, { categorie, image }) => {
   const [result] = await pool.query(
-    'UPDATE Categorie SET categorie = ? image = ? WHERE id_categorie = ?',
-    [categorie, id , image]
+    'UPDATE Categorie SET categorie = ?, image = ? WHERE id_categorie = ?',
+    [categorie, image, id] 
   );
   return result.affectedRows > 0;
 };

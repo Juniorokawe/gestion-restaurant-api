@@ -25,8 +25,8 @@ const create = async ({ nom, description, prix, id_restaurant, image }) => {
 // Mettre à jour un plat
 const update = async (id, { nom, description, prix, id_restaurant, image }) => {
   const [result] = await pool.query(
-    'UPDATE Plat SET nom = ?, description = ?, prix = ?, image = ?, id_restaurant = ? WHERE id_plat = ?',
-    [nom, description, image, prix, id_restaurant, id]
+    'UPDATE Plat SET nom = ?, description = ?, prix = ?, id_restaurant = ?,  image = ? WHERE id_plat = ?',
+    [nom, description, prix, id_restaurant, image, id]
   );
   return result.affectedRows > 0;
 };

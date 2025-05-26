@@ -10,11 +10,13 @@ router.use((req, res, next) => {
 });
 
 
-// Routes publiques
-router.post('/register', utilisateurController.createUtilisateur);
-router.post('/login', utilisateurController.loginUtilisateur);
+// Routes publiques (sans authentification)
+router.post('/inscription', utilisateurController.register);
+router.post('/connexion', utilisateurController.loginUtilisateur); // Utilisez loginUtilisateur au lieu de login
+router.post('/verify-otp', utilisateurController.verifyOTP);
+router.post('/resend-otp', utilisateurController.resendOTP);
 
-// Routes protégées
+// Routes protégées (avec authentification)
 router.use(auth);
 router.get('/', utilisateurController.getAllUtilisateurs);
 router.get('/:id', utilisateurController.getUtilisateurById);

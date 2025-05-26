@@ -30,27 +30,24 @@ const getRestaurantById = async (req, res) => {
 // POST /restaurants
 const createRestaurant = async (req, res) => {
   try {
-    const { nom, phone, image, categorie, adresse } = req.body;
+    const { nom, adresse, phone, image, horaires } = req.body;
 
-    const nouveauRestaurant = await RestaurantModel.create({ nom, phone, categorie, image, adresse });
+    const nouveauRestaurant = await RestaurantModel.create({ nom, adresse, phone, image, horaires });
     res.status(201).json({ message: 'Restaurant ajouté', restaurant: nouveauRestaurant });
   } catch (error) {
-    console.error("Erreur createRestaurant:", error);
-    if (error.code === 'ER_DUP_ENTRY') {
-         return res.status(409).json({ message: 'Cet email est déjà utilisé.' });
+    
     }
     res.status(500).json({ message: 'Erreur serveur lors de la création du restaurant' });
-  }
-};
+  };
 
 // PUT /restaurants/:id
 const updateRestaurant = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nom, phone, image, categorie } = req.body;
+    const { nom, adresse, phone, image, horaires } = req.body;
      
 
-    const affectedRows = await RestaurantModel.update(id, { nom, phone, categorie, image });
+    const affectedRows = await RestaurantModel.update(id, { nom, adresse, phone, image, horaires });
     if (affectedRows === 0) {
       return res.status(404).json({ message: 'Restaurant non trouvé pour la mise à jour' });
     }

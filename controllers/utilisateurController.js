@@ -1,6 +1,12 @@
+const transporter = require('../config/mailer');
 const UtilisateurModel = require('../models/utilisateurModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+
+// Fonction pour générer un code OTP
+const generateOTP = () => {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+};
 
 const getAllUtilisateurs = async (req, res) => {
   try {
@@ -40,8 +46,7 @@ const createUtilisateur = async (req, res) => {
       telephone,
       email,
       password: hashedPassword,
-      role,
-      image
+      role
     });
 
     res.status(201).json({
@@ -178,11 +183,140 @@ const deleteUtilisateur = async (req, res) => {
   }
 };
 
+const register = async (req, res) => {
+    try {
+        const { nom, prenom, telephone, email, password, role } = req.body;
+
+        // Validation
+        if (!email || !password || !role) {
+            return res.status(400).json({ 
+                message: 'Les champs email, mot de passe et rôle sont obligatoires' 
+            });
+        }
+
+        // Vérification email unique
+        const existingUser = await UtilisateurModel.findByEmail(email);
+        if (existingUser) {
+            return res.status(400).json({ message: 'Cet email est déjà utilisé' });
+        }
+
+        // Validation du rôle
+        if (!['restaurant', 'client'].includes(role)) {
+            return res.status(400).json({ message: 'Rôle invalide' });
+        }
+
+        // Hashage du mot de passe
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Création de l'utilisateur
+        const nouvelUtilisateur = await UtilisateurModel.create({
+            nom, prenom, telephone, email, password: hashedPassword, role
+        });
+
+        // Génération et stockage de l'OTP
+        const otp = generateOTP();
+        const expiryTime = new Date(Date.now() + 5 * 60000); // 5 minutes
+        await UtilisateurModel.storeOTP(nouvelUtilisateur.id, otp, expiryTime);
+
+        // Envoi de l'email avec l'OTP
+        await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: 'Vérification de votre compte',
+            html: `
+                <h1>Bienvenue sur notre plateforme</h1>
+                <p>Votre code de vérification est : <strong>${otp}</strong></p>
+                <p>Ce code expirera dans 5 minutes.</p>
+            `
+        });
+
+        res.status(201).json({
+            message: 'Inscription réussie. Veuillez vérifier votre email',
+            userId: nouvelUtilisateur.id
+        });
+    } catch (error) {
+        console.error("Erreur inscription:", error);
+        res.status(500).json({ message: 'Erreur lors de l\'inscription' });
+    }
+};
+
+// Nouvelle fonction pour vérifier l'OTP
+const verifyOTP = async (req, res) => {
+    try {
+        const { userId, otp } = req.body;
+
+        const verification = await UtilisateurModel.verifyOTP(userId, otp);
+        if (!verification) {
+            return res.status(400).json({ 
+                message: 'Code OTP invalide ou expiré' 
+            });
+        }
+
+        await UtilisateurModel.markAsVerified(userId);
+
+        // Génération du token après vérification
+        const token = jwt.sign(
+            { userId, role: verification.role },
+            process.env.JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+
+        res.json({
+            message: 'Email vérifié avec succès',
+            token,
+            utilisateur: {
+                id: verification.id_utilisateur,
+                nom: verification.nom,
+                email: verification.email,
+                role: verification.role
+            }
+        });
+    } catch (error) {
+        console.error("Erreur vérification OTP:", error);
+        res.status(500).json({ message: 'Erreur lors de la vérification' });
+    }
+};
+
+// Fonction pour renvoyer l'OTP
+const resendOTP = async (req, res) => {
+    try {
+        const { userId } = req.body;
+        const utilisateur = await UtilisateurModel.findById(userId);
+
+        if (!utilisateur) {
+            return res.status(404).json({ message: 'Utilisateur non trouvé' });
+        }
+
+        const otp = generateOTP();
+        const expiryTime = new Date(Date.now() + 5 * 60000);
+        await UtilisateurModel.storeOTP(userId, otp, expiryTime);
+
+        await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: utilisateur.email,
+            subject: 'Nouveau code de vérification',
+            html: `
+                <h1>Nouveau code de vérification</h1>
+                <p>Votre nouveau code est : <strong>${otp}</strong></p>
+                <p>Ce code expirera dans 5 minutes.</p>
+            `
+        });
+
+        res.json({ message: 'Nouveau code envoyé avec succès' });
+    } catch (error) {
+        console.error("Erreur renvoi OTP:", error);
+        res.status(500).json({ message: 'Erreur lors du renvoi du code' });
+    }
+};
+
 module.exports = {
   getAllUtilisateurs,
   getUtilisateurById,
   createUtilisateur,
-  loginUtilisateur,
+  loginUtilisateur, // Changez 'login' en 'loginUtilisateur'
   updateUtilisateur,
-  deleteUtilisateur
+  deleteUtilisateur,
+  register,
+  verifyOTP,
+  resendOTP
 };

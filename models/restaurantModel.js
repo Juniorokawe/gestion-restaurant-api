@@ -14,7 +14,7 @@ const findById = async (id) => {
 };
 
 // Créer un nouveau restaurant
-const create = async ({ nom, adresse, telephone, email, horaires }) => {
+const create = async ({ nom, adresse, phone, image, horaires }) => {
   const sql = 'INSERT INTO Restaurant (nom, adresse, phone, image, horaires) VALUES (?, ?, ?, ?, ?)';
   const [result] = await pool.query(sql, [nom, adresse, phone, image, horaires]);
   return { id: result.insertId, nom, adresse, phone, image, horaires };
