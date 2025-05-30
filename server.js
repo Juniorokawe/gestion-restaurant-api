@@ -35,6 +35,8 @@ const livraisonRoutes = require('./routes/livraisonRoutes');
 const livreurRoutes = require('./routes/livreurRoutes');
 const platRoutes = require('./routes/platRoutes');
 const restaurantRoutes = require('./routes/restaurantRoutes');
+const pvitRoutes = require('./routes/pvitRoutes');
+
 
 // Configuration des routes
 app.use('/api/v1/utilisateurs', utilisateurRoutes);
@@ -44,6 +46,7 @@ app.use('/api/v1/livraisons', livraisonRoutes);
 app.use('/api/v1/livreurs', livreurRoutes);
 app.use('/api/v1/plats', platRoutes);
 app.use('/api/v1/restaurants', restaurantRoutes);
+app.use('/api/v1/pvit', pvitRoutes);
 
 // Route de test API
 app.get('/api/test', (req, res) => {
@@ -77,11 +80,11 @@ app.listen(port, () => {
 
 // Gestion des signaux d'arrêt
 process.on('SIGTERM', () => {
-  console.log('Signal SIGTERM reçu. Arrêt gracieux du serveur...');
+  console.log('Signal SIGTERM reçu. Arrêt du serveur...');
   process.exit(0);
 });
 
 process.on('SIGINT', () => {
-  console.log('Signal SIGINT reçu. Arrêt gracieux du serveur...');
+  console.log('Signal SIGINT reçu. Arrêt du serveur...');
   process.exit(0);
 });
