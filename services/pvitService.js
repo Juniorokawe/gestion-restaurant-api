@@ -93,7 +93,7 @@ const generatePaymentLink = async ({
 }) => {
   if (!X_SECRET) await loadSecretKey();
 
-  const response = await axios.post(`${BASE_URL}/${CODE_URL}/link`, {
+  const response = await axios.post(`${BASE_URL}/${CODE_URL}/RESTLINK`, {
     agent,
     amount,
     product,
