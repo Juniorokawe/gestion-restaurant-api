@@ -58,3 +58,9 @@ module.exports = (req, res, next) => {
     });
   }
 };
+
+// middleware/auth.js
+module.exports.auth = (req, res, next) => {
+  // Authentification simple ou logique de vérification de token ici
+  next();
+};
