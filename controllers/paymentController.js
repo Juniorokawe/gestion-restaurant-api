@@ -1,13 +1,16 @@
 const axios = require('axios');
 const Transaction = require('../models/Transaction');
 const generateReference = require('../utils/referenceGenerator');
-const { ensureValidSecretKey, cachedSecretKey } = require('../config/secretKeyManager');
+const { ensureValidSecretKey, getSecretKey } = require('../config/secretKeyManager');
 const { waitForTransactionCallback } = require('../utils/waitForCallback');
 
 exports.initiatePayment = async (req, res) => {
   let reference;
+
   try {
+    // 🔐 Générer / renouveler la clé si besoin
     await ensureValidSecretKey();
+    const secret = getSecretKey(); // ✅ Récupération propre
 
     const {
       amount,
@@ -19,7 +22,10 @@ exports.initiatePayment = async (req, res) => {
     } = req.body;
 
     if (!amount || !customer_account_number) {
-      return res.status(400).json({ success: false, message: 'amount et customer_account_number requis.' });
+      return res.status(400).json({
+        success: false,
+        message: 'amount et customer_account_number requis.'
+      });
     }
 
     reference = generateReference();
@@ -52,16 +58,22 @@ exports.initiatePayment = async (req, res) => {
       updated_at: new Date()
     });
 
-    const response = await axios.post(`${process.env.PVIT_BASE_URL}/FDY25APFTXSVPZV1/rest`, pvitTransactionData, {
-      headers: {
-        'X-Secret': cachedSecretKey,
-        'X-Callback-MediaType': 'application/json',
-        'Content-Type': 'application/json'
+    const response = await axios.post(
+      `${process.env.PVIT_BASE_URL}/FDY25APFTXSVPZV1/rest`,
+      pvitTransactionData,
+      {
+        headers: {
+          'X-Secret': secret,
+          'X-Callback-MediaType': 'application/json',
+          'Content-Type': 'application/json'
+        }
       }
-    });
+    );
 
     if (response.data.transaction_id && response.data.transaction_id !== `INIT_${reference}`) {
-      await Transaction.updateTransaction(reference, { transaction_id: response.data.transaction_id });
+      await Transaction.updateTransaction(reference, {
+        transaction_id: response.data.transaction_id
+      });
     }
 
     const result = await waitForTransactionCallback(reference);
@@ -78,8 +90,13 @@ exports.initiatePayment = async (req, res) => {
 
   } catch (error) {
     if (error.message.includes('Timeout')) {
-      return res.status(408).json({ success: false, message: 'Timeout', reference });
+      return res.status(408).json({
+        success: false,
+        message: 'Timeout — webhook non reçu',
+        reference
+      });
     }
+
     res.status(500).json({
       success: false,
       message: 'Erreur de paiement',
@@ -88,3 +105,4 @@ exports.initiatePayment = async (req, res) => {
     });
   }
 };
+
