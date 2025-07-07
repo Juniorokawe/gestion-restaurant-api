@@ -26,7 +26,7 @@ app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Middleware d'authentification (à désactiver temporairement si besoin de tester sans auth)
-app.use(middleware.auth);
+// app.use(middleware.auth);
 
 // Importation des routes
 const utilisateurRoutes = require('./routes/utilisateurRoutes');
@@ -36,7 +36,8 @@ const livraisonRoutes = require('./routes/livraisonRoutes');
 const livreurRoutes = require('./routes/livreurRoutes');
 const platRoutes = require('./routes/platRoutes');
 const restaurantRoutes = require('./routes/restaurantRoutes');
-const paymentRoutes = require('./routes/paymentRoutes');
+const paymentRoute = require('./routes/paymentRoute');
+const webhookRoute = require('./routes/webhookRoute');
 
 // Définition des préfixes pour les routes
 app.use('/api/v1/utilisateurs', utilisateurRoutes);
@@ -46,7 +47,11 @@ app.use('/api/v1/livraisons', livraisonRoutes);
 app.use('/api/v1/livreurs', livreurRoutes);
 app.use('/api/v1/plats', platRoutes);
 app.use('/api/v1/restaurants', restaurantRoutes);
-app.use('/api/v1/payment', paymentRoutes);
+app.use('/api/payment', paymentRoute);
+app.use('/api/webhook', webhookRoute);
+
+
+
 
 // Route de test API
 app.get('/api/test', (req, res) => {

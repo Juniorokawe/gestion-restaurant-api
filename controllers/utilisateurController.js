@@ -2,8 +2,7 @@ const transporter = require('../config/mailer');
 const UtilisateurModel = require('../models/utilisateurModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const generateClientId = require('../utils/generateClientId');
-const id = generateClientId(nom);
+
 
 // Fonction pour générer un code OTP
 const generateOTP = () => {
