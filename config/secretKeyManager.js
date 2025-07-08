@@ -24,10 +24,7 @@ async function ensureValidSecretKey() {
     }
   }
   //
-   await new Promise(resolve => setTimeout(resolve, 2000));
-            if (!SecretKey) {
-                throw new Error('La clé secrète n\'a pas été reçue via le callback après le renouvellement.');
-            }
+   
 
 
 
