@@ -2,13 +2,14 @@ const axios = require('axios');
 const Transaction = require('../models/Transaction');
 const generateReference = require('../utils/referenceGenerator');
 const { ensureValidSecretKey, getSecretKey } = require('../config/secretKeyManager');
-const { waitForTransactionCallback } = require('../utils/waitForCallback');
+const { waitForTransactionCallback} = require('../utils/waitForCallback');
 
 exports.initiatePayment = async (req, res) => {
   let reference;
   try {
     await ensureValidSecretKey();
-    const secret = getSecretKey();
+    let secret = getSecretKey();
+    console.log('SecretKey utilisée pour la transaction :', secret);
     const {
       amount,
       product,
@@ -83,10 +84,12 @@ exports.initiatePayment = async (req, res) => {
       });
     }
     // Réponse immédiate, le statut sera mis à jour par le webhook
+   const transaction_result= await waitForTransactionCallback(reference);
     res.status(200).json({
       success: true,
       message: 'Transaction initiée, en attente de confirmation.',
       data: {
+        ...transaction_result,
         initial_pvit_response: response.data,
         reference
       }
