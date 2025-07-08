@@ -52,24 +52,18 @@ exports.initiatePayment = async (req, res) => {
     });
     let response;
     try {
-      const formData = new URLSearchParams();
-for (const [key, value] of Object.entries(pvitTransactionData)) {
-  formData.append(key, value);
-}
-
-response = await axios.post(
-  `${process.env.PVIT_BASE_URL}/FDY25APFTXSVPZV1/rest`,
-  formData.toString(),
-  {
-    headers: {
-      'X-Secret': secret,
-      'X-Callback-MediaType': 'application/json',
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    timeout: 15000
-  }
-);
-
+      response = await axios.post(
+        `${process.env.PVIT_BASE_URL}/FDY25APFTXSVPZV1/rest`,
+        pvitTransactionData,
+        {
+          headers: {
+            'X-Secret': secret,
+            'X-Callback-MediaType': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          timeout: 15000 // 15s timeout
+        }
+      );
     } catch (err) {
       await Transaction.updateTransaction(reference, {
         status: 'FAILED',
