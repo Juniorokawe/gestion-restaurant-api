@@ -6,12 +6,9 @@ const { waitForTransactionCallback } = require('../utils/waitForCallback');
 
 exports.initiatePayment = async (req, res) => {
   let reference;
-
   try {
-    // 🔐 Générer / renouveler la clé si besoin
     await ensureValidSecretKey();
-    const secret = getSecretKey(); // ✅ Récupération propre
-
+    const secret = getSecretKey();
     const {
       amount,
       product,
@@ -20,16 +17,13 @@ exports.initiatePayment = async (req, res) => {
       owner_charge = "MERCHANT",
       owner_charge_operator = "MERCHANT"
     } = req.body;
-
     if (!amount || !customer_account_number) {
       return res.status(400).json({
         success: false,
         message: 'amount et customer_account_number requis.'
       });
     }
-
     reference = generateReference();
-
     const pvitTransactionData = {
       agent: process.env.PVIT_AGENT || "AGENT-1",
       amount,
@@ -44,7 +38,6 @@ exports.initiatePayment = async (req, res) => {
       owner_charge_operator,
       free_info: (free_info || "Transaction Initiale").substring(0, 15)
     };
-
     await Transaction.create({
       transaction_id: `INIT_${reference}`,
       reference,
@@ -57,46 +50,55 @@ exports.initiatePayment = async (req, res) => {
       created_at: new Date(),
       updated_at: new Date()
     });
-
-    const response = await axios.post(
-      `${process.env.PVIT_BASE_URL}/FDY25APFTXSVPZV1/rest`,
-      pvitTransactionData,
-      {
-        headers: {
-          'X-Secret': secret,
-          'X-Callback-MediaType': 'application/json',
-          'Content-Type': 'application/json'
+    let response;
+    try {
+      response = await axios.post(
+        `${process.env.PVIT_BASE_URL}/FDY25APFTXSVPZV1/rest`,
+        pvitTransactionData,
+        {
+          headers: {
+            'X-Secret': secret,
+            'X-Callback-MediaType': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          timeout: 15000 // 15s timeout
         }
-      }
-    );
-
+      );
+    } catch (err) {
+      await Transaction.updateTransaction(reference, {
+        status: 'FAILED',
+        error_message: err.message,
+        updated_at: new Date()
+      });
+      console.error(`[PVIT] Erreur communication:`, err.message, err.response?.data);
+      return res.status(502).json({
+        success: false,
+        message: 'Erreur de communication avec le service de paiement',
+        error: err.message,
+        reference
+      });
+    }
     if (response.data.transaction_id && response.data.transaction_id !== `INIT_${reference}`) {
       await Transaction.updateTransaction(reference, {
         transaction_id: response.data.transaction_id
       });
     }
-
-    const result = await waitForTransactionCallback(reference);
-
+    // Réponse immédiate, le statut sera mis à jour par le webhook
     res.status(200).json({
       success: true,
-      message: 'Transaction réussie via webhook.',
+      message: 'Transaction initiée, en attente de confirmation.',
       data: {
-        ...result,
         initial_pvit_response: response.data,
         reference
       }
     });
-
   } catch (error) {
-    if (error.message.includes('Timeout')) {
-      return res.status(408).json({
-        success: false,
-        message: 'Timeout — webhook non reçu',
-        reference
-      });
-    }
-
+    await Transaction.updateTransaction(reference, {
+      status: 'FAILED',
+      error_message: error.message,
+      updated_at: new Date()
+    });
+    console.error(`[API] Erreur paiement:`, error.message, error.stack);
     res.status(500).json({
       success: false,
       message: 'Erreur de paiement',

@@ -25,30 +25,30 @@ const Transaction = {
 
   updateTransaction: async (reference, fields) => {
     const conn = await pool.getConnection();
+    // Construction dynamique de la requête pour mettre à jour plusieurs champs
+    const setFields = [];
+    const values = [];
+    for (const key in fields) {
+      setFields.push(`${key} = ?`);
+      values.push(fields[key]);
+    }
+    setFields.push('updated_at = NOW()');
     const query = `
-      UPDATE transactions_pvit SET transaction_id = ?, updated_at = NOW()
+      UPDATE transactions_pvit
+      SET ${setFields.join(', ')}
       WHERE reference = ?
     `;
-    await conn.query(query, [fields.transaction_id, reference]);
+    values.push(reference);
+    await conn.query(query, values);
     conn.release();
+  },
+
+  findByReference: async (reference) => {
+    const conn = await pool.getConnection();
+    const [rows] = await conn.query('SELECT * FROM transactions_pvit WHERE reference = ?', [reference]);
+    conn.release();
+    return rows[0];
   }
 };
 
-
-
-updateTransaction: async (reference, fields) => {
-  const conn = await pool.getConnection();
-  const query = `
-    UPDATE transactions_pvit
-    SET transaction_id = ?, status = ?, updated_at = ?
-    WHERE reference = ?
-  `;
-  await conn.query(query, [
-    fields.transaction_id,
-    fields.status,
-    fields.updated_at,
-    reference
-  ]);
-  conn.release();
-}
 module.exports = Transaction;
