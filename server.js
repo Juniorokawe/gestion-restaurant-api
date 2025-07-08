@@ -38,6 +38,7 @@ const platRoutes = require('./routes/platRoutes');
 const restaurantRoutes = require('./routes/restaurantRoutes');
 const paymentRoute = require('./routes/paymentRoute');
 const webhookRoute = require('./routes/webhookRoute');
+const secretKeyRoutes = require('./routes/secretKeyRoutes');
 
 // Définition des préfixes pour les routes
 app.use('/api/v1/utilisateurs', utilisateurRoutes);
@@ -49,6 +50,7 @@ app.use('/api/v1/plats', platRoutes);
 app.use('/api/v1/restaurants', restaurantRoutes);
 app.use('/api/payment', paymentRoute);
 app.use('/api/webhook', webhookRoute);
+app.use('/api/secret', secretKeyRoutes);
 
 
 
