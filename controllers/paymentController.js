@@ -61,7 +61,6 @@ exports.initiatePayment = async (req, res) => {
             'X-Callback-MediaType': 'application/json',
             'Content-Type': 'application/json'
           },
-          timeout: 15000 // 15s timeout
         }
       );
     } catch (err) {
