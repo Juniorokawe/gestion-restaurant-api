@@ -31,13 +31,12 @@ async function ensureValidSecretKey() {
       throw error;
     }
   }
-}
-
-function getSecretKey() {
   return secretKey;
 }
 
+
+
 module.exports = {
-  ensureValidSecretKey,
-  getSecretKey,
+  ensureValidSecretKey
+  
 };
