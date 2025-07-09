@@ -7,7 +7,7 @@ exports.renewSecretKey = async (req, res) => {
     secretKey=secret_key
     lastUpdatedAt=Date.now()
     res.status(200).json({
-      message: '✅ Clé secrète renouvelée avec succès',
+      message: '✅ Clé secrète renouvelée avec succès'
       
     });
   } catch (err) {

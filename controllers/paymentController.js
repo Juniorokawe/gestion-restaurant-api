@@ -6,10 +6,10 @@ const { waitForTransactionCallback} = require('../utils/waitForCallback');
 
 exports.initiatePayment = async (req, res) => {
   let reference;
-  try {
-    await ensureValidSecretKey();
+  await ensureValidSecretKey();
     let secret = secretKey;
     console.log('SecretKey utilisée pour la transaction :', secret);
+  try {
     const {
       amount,
       product,
