@@ -7,6 +7,8 @@ const { waitForTransactionCallback } = require('../utils/waitForCallback');
 exports.initiatePayment = async (req, res) => {
   let reference;
 
+
+
   try {
     // ✅ Récupération correcte de la clé secrète
     const secret = await ensureValidSecretKey();
