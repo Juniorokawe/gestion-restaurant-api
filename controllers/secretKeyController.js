@@ -1,9 +1,10 @@
 const { ensureValidSecretKey, getSecretKey } = require('../config/secretKeyManager');
-const secret_key = req.body
+
 let lastUpdatedAt = null;
 exports.renewSecretKey = async (req, res) => {
   try {
     await ensureValidSecretKey();
+    const {secret_key} = req.body
     getSecretKey()=secret_key
     lastUpdatedAt=Date.now()
     res.status(200).json({
