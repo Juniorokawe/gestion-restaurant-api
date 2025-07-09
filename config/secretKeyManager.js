@@ -22,7 +22,6 @@ async function ensureValidSecretKey() {
         }
       );
 
-      // Mise à jour de la clé et du timestamp
       secretKey = response.data.secret_key;
       lastUpdatedAt = now;
       console.log("✅ Nouvelle clé secrète récupérée :", secretKey);
@@ -31,12 +30,9 @@ async function ensureValidSecretKey() {
       throw error;
     }
   }
-  return secretKey;
+  return secretKey; // ✅ très important
 }
-
-
 
 module.exports = {
   ensureValidSecretKey
-  
 };
