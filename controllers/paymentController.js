@@ -2,18 +2,15 @@ const axios = require('axios');
 const Transaction = require('../models/Transaction');
 const generateReference = require('../utils/referenceGenerator');
 const { ensureValidSecretKey } = require('../config/secretKeyManager');
-const { waitForTransactionCallback } = require('../utils/waitForCallback');
+const { waitForTransactionCallback} = require('../utils/waitForCallback');
+
 
 exports.initiatePayment = async (req, res) => {
   let reference;
-
-
-
-  try {
-    // ✅ Récupération correcte de la clé secrète
-    const secret = await ensureValidSecretKey();
+  await ensureValidSecretKey();
+    let secret = secretKey;
     console.log('SecretKey utilisée pour la transaction :', secret);
-
+  try {
     const {
       amount,
       product,
@@ -22,17 +19,13 @@ exports.initiatePayment = async (req, res) => {
       owner_charge = "MERCHANT",
       owner_charge_operator = "MERCHANT"
     } = req.body;
-
-    // ✅ Validation des champs obligatoires
     if (!amount || !customer_account_number) {
       return res.status(400).json({
         success: false,
         message: 'amount et customer_account_number requis.'
       });
     }
-
     reference = generateReference();
-
     const pvitTransactionData = {
       agent: process.env.PVIT_AGENT || "AGENT-1",
       amount,
@@ -47,7 +40,6 @@ exports.initiatePayment = async (req, res) => {
       owner_charge_operator,
       free_info: (free_info || "Transaction Initiale").substring(0, 15)
     };
-
     await Transaction.create({
       transaction_id: `INIT_${reference}`,
       reference,
@@ -60,7 +52,6 @@ exports.initiatePayment = async (req, res) => {
       created_at: new Date(),
       updated_at: new Date()
     });
-
     let response;
     try {
       response = await axios.post(
@@ -88,17 +79,13 @@ exports.initiatePayment = async (req, res) => {
         reference
       });
     }
-
-    // Mise à jour du transaction_id si différent
     if (response.data.transaction_id && response.data.transaction_id !== `INIT_${reference}`) {
       await Transaction.updateTransaction(reference, {
         transaction_id: response.data.transaction_id
       });
     }
-
-    // 🔄 Attente du callback (webhook) pour finaliser le statut
-    const transaction_result = await waitForTransactionCallback(reference);
-
+    // Réponse immédiate, le statut sera mis à jour par le webhook
+   const transaction_result= await waitForTransactionCallback(reference);
     res.status(200).json({
       success: true,
       message: 'Transaction initiée, en attente de confirmation.',
@@ -108,9 +95,7 @@ exports.initiatePayment = async (req, res) => {
         reference
       }
     });
-
   } catch (error) {
-    // ❌ Gestion des erreurs globales
     await Transaction.updateTransaction(reference, {
       status: 'FAILED',
       error_message: error.message,
@@ -125,3 +110,4 @@ exports.initiatePayment = async (req, res) => {
     });
   }
 };
+
