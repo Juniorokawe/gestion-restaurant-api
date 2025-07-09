@@ -4,7 +4,7 @@ exports.renewSecretKey = async (req, res) => {
   try {
     await ensureValidSecretKey();
     const {secret_key} = req.body
-    SecretKey=secret_key
+    secretKey=secret_key
     lastUpdatedAt=Date.now()
     res.status(200).json({
       message: '✅ Clé secrète renouvelée avec succès',

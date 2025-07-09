@@ -1,14 +1,14 @@
 const axios = require('axios');
 const Transaction = require('../models/Transaction');
 const generateReference = require('../utils/referenceGenerator');
-const { ensureValidSecretKey, getSecretKey } = require('../config/secretKeyManager');
+const { ensureValidSecretKey } = require('../config/secretKeyManager');
 const { waitForTransactionCallback} = require('../utils/waitForCallback');
 
 exports.initiatePayment = async (req, res) => {
   let reference;
   try {
     await ensureValidSecretKey();
-    let secret = getSecretKey();
+    let secret = secretKey;
     console.log('SecretKey utilisée pour la transaction :', secret);
     const {
       amount,
